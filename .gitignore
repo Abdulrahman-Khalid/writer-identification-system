@@ -1,2 +1,4 @@
 test_images/
+preprocessed_images/
 .vscode/
+.ipynb_checkpoints/
