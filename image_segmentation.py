@@ -9,6 +9,6 @@ def image_segmentation(image, threshold):
     
     # Method Two
     imgFiltered = cv2.bilateralFilter(image, 9, 75, 75)
-    (_, imgThres) = cv2.threshold(image,0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    (words_contours, _) = cv2.findContours(np.invert(imgThres), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    _, imgThres = cv2.threshold(imgFiltered,0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    words_contours, _ = cv2.findContours(np.invert(imgThres), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     return words_contours
