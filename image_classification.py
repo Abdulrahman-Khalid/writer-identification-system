@@ -14,7 +14,7 @@ def image_classification(train_images_features, train_images_labels, test_image_
         poly = svm.SVC(kernel='poly', degree=3, C=1, decision_function_shape='ovo')
         poly = poly.fit(train_images_features, train_images_labels)
         return poly.predict(test_image_features)
-     elif(kernel == "sigmoid"):
+    elif(kernel == "sigmoid"):
         sig = svm.SVC(kernel='sigmoid', C=1, decision_function_shape='ovo').fit(train_images_features, train_images_labels)
         sig = sig.fit(train_images_features, train_images_labels)
         return sig.predict(test_image_features)
