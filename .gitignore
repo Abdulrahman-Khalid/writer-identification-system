@@ -3,3 +3,5 @@ preprocessed_images/
 .vscode/
 .ipynb_checkpoints/
 testing.py
+.idea
+venv
