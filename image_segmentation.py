@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
 
-def image_segmentation(image, threshold):
+
+def image_segmentation(img, threshold):
     # Method One
     # kernel = np.ones((3,50), np.uint8)
     # image_dilation = cv2.dilate(np.invert(image), kernel, iterations=1).astype(np.uint8)

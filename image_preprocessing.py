@@ -1,5 +1,6 @@
 import cv2
 
+
 def image_preprocessing(image):
     # Crop the image to get the handwritten text area
     image = image[680:2800,150:]

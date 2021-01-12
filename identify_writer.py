@@ -1,4 +1,3 @@
-import os
 import cv2
 import numpy as np
 from time import time
@@ -23,18 +22,14 @@ for test_case in test_cases:
         threshold, binary_image = image_preprocessing(image)
         words_contours = image_segmentation(binary_image, threshold)
         # TODO: Features Extraction
-        if(image_path == test_image_path):
+        if image_path == test_image_path:
             # test_image_features.append(feature vector)
             pass
         else:
             # train_images_features.append(feature vector)
             pass
-    predicition = image_classification(train_images_features, train_images_labels, test_image_features)
+    prediction = image_classification(train_images_features, train_images_labels, test_image_features)
     test_time = time() - time_before
-    results_file.write(predicition)
-    times_file.write(test_time)
+    results_file.write(prediction)
+    times_file.write(str(test_time))
     # TODO: Performance Analysis
-
-
-
-    
