@@ -7,3 +7,5 @@ testing.py
 venv
 data
 correct_writers.txt
+results.txt
+time.txt
