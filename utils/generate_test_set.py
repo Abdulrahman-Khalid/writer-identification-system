@@ -30,10 +30,6 @@ class TestsGenerator:
                 if line.startswith('#'):
                     continue
                 form_id, writer_id, _ = line.split(maxsplit=2)
-                # TODO: remove this condition when all the data is available.
-                # Ignore all forms beyond D.
-                if form_id[0] > 'd':
-                    continue
                 self.writers_forms[writer_id].append(form_id)
 
         # Filter out writer with no enough forms to construct a test case.
