@@ -3,3 +3,9 @@ preprocessed_images/
 .vscode/
 .ipynb_checkpoints/
 testing.py
+.idea
+venv
+data
+correct_writers.txt
+results.txt
+time.txt
