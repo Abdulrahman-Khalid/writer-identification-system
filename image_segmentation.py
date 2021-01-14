@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 
-def line_segmentation(img, image_name):
+def line_segmentation(img):
     # Apply Dilation to mix all line words or all words characters together
     dilation_kernel = np.ones((1, 190), np.uint8)
     image_dilation = cv2.dilate(np.invert(img), dilation_kernel, iterations=1).astype(np.uint8)
