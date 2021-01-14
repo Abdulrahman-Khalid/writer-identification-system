@@ -3,13 +3,18 @@ import cv2
 from scipy.stats import itemfreq
 from skimage.feature import local_binary_pattern
 
-def get_features(gray_images, binary_images, radius=3, no_points= 3*8, method='uniform'): # try no_points = 3 * 8
+def get_features(gray_image, binary_image, contours, radius=3, no_points= 3*8, method='uniform'): # try no_points = 3 * 8
     features = []
     hist = np.zeros(256)
-    for idx in range(len(binary_images)):
-        lbp = local_binary_pattern(gray_images[idx], no_points, radius, method=method).astype(np.uint8)
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
+        if(h < 50):
+            continue
+        gray_line = gray_image[y:y+h, x:x+w]
+        binary_line = binary_image[y:y+h, x:x+w]
+        lbp = local_binary_pattern(gray_line, no_points, radius, method=method).astype(np.uint8)
         print(lbp)
-        hist = cv2.calcHist([lbp], [0], binary_images[idx], [256], [0, 256], hist, True).ravel()
+        hist = cv2.calcHist([lbp], [0], binary_line, [256], [0, 256], hist, True).ravel()
     hist /= np.mean(hist)
     features.extend(hist)
 
