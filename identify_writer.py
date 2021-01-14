@@ -6,14 +6,23 @@ from image_segmentation import line_segmentation
 from image_classification import image_classification
 from feature_extractor import get_features
 from utils import sorted_subdirectories, read_test_case_images
+from tqdm import tqdm
+import argparse
 
-TESTS_PATH = "data"
+parser = argparse.ArgumentParser()
+parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
+parser.add_argument('--data', help='path to data dir', default='data')
+parser.add_argument('--results', help='path to results output file', default='results.txt')
+parser.add_argument('--time', help='path to time output file', default='time.txt')
+args = parser.parse_args()
 
-test_cases = sorted_subdirectories(TESTS_PATH)
-results_file = open("results.txt", "w")
-times_file = open("time.txt", "w")
+test_cases = sorted_subdirectories(args.data)
 
-for test_case in test_cases:
+# clear files
+open(args.results, "w")
+open(args.time, "w")
+
+for test_case in tqdm(test_cases, desc='Test Cases', unit='case'):
     test_image_path, train_images_paths, train_images_labels = read_test_case_images(test_case)
     all_paths = np.append(train_images_paths, test_image_path)
 
@@ -32,7 +41,7 @@ for test_case in test_cases:
     for gray_image, is_test_img in all_imgs:
         binary_image, gray_image = image_preprocessing(gray_image)
         line_contours = line_segmentation(binary_image)
-        feature_vector = get_features(gray_image, binary_image, line_contours)
+        feature_vector = get_features(gray_image, binary_image, line_contours, verbose=args.verbose)
 
         if is_test_img:
             test_image_features.append(feature_vector)
@@ -46,5 +55,8 @@ for test_case in test_cases:
     )
     test_time = time() - time_before
 
-    results_file.write(f'{int(predictions[0])}\n')
-    times_file.write(f'{test_time:.2f}\n')
+    with open(args.results, "a") as f:
+        f.write(f'{int(predictions[0])}\n')
+    
+    with open(args.time, 'a') as f:
+        f.write(f'{test_time:.2f}\n')
