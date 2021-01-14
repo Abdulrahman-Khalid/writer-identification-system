@@ -3,8 +3,10 @@ import random
 import shutil
 import os
 from collections import defaultdict
+import json
 
 expected_output_path = 'correct_writers.txt'
+map_path = 'map.json'
 test_set_path = 'data'
 test_form_name = 'test'
 forms_extension = '.png'
@@ -17,10 +19,15 @@ class TestsGenerator:
         Generates a test set by creating hard links to existing form images in the original dataset.
         Form images are NOT copied.
     """
-    def __init__(self, metadata_path, forms_path):
+    def __init__(self, metadata_path, forms_path, map_path):
         self.writers_forms = defaultdict(lambda: [])
         self.read_metadata(metadata_path)
         self.forms_path = forms_path
+        self.map = None
+        if map_path is not None:
+            with open(map_path, 'r') as f:
+                self.map = json.load(f)
+        self.mymap = {'dirs': [], 'links': [], 'expected_output': ''}
 
     def read_metadata(self, metadata_file_path):
         # Get the form ids for each writer.
@@ -61,6 +68,7 @@ class TestsGenerator:
             # Create a directory for the writer's sample forms.
             test_writer_path = test_case_path + '/' + str(writer_idx)
             os.mkdir(test_writer_path)
+            self.mymap['dirs'].append(test_writer_path)
 
             if writer == correct_writer:
                 # Write the writer index to the expected output file.
@@ -75,6 +83,8 @@ class TestsGenerator:
                 src = self.forms_path + '/' + test_form + forms_extension
                 dst = test_case_path + '/' + test_form_name + forms_extension
                 os.link(src, dst)
+
+                self.mymap['links'].append([os.path.relpath(self.forms_path, src), dst])
             else:
                 sample_forms = random.sample(self.writers_forms[writer], test_samples_per_writer)
 
@@ -84,21 +94,42 @@ class TestsGenerator:
                 dst = test_writer_path + '/' + str(form_idx) + forms_extension
                 os.link(src, dst)
 
+                self.mymap['links'].append([os.path.relpath(self.forms_path, src), dst])
+
     def generate_test_set(self, size):
         # Remove the test set directory if it already exists.
         shutil.rmtree(test_set_path, ignore_errors=True)
         os.mkdir(test_set_path)
+        self.mymap['dirs'].append(test_set_path)
         # Remove the expected output file if it already exists.
         try:
             os.remove(expected_output_path)
         except OSError:
             pass
-        # Generate test cases.
-        for test_case_idx in range(1, size + 1):
-            test_case_path = test_set_path + '/' + f'{test_case_idx:02}'
-            os.mkdir(test_case_path)
-            self.generate_test_case(test_case_path)
-
+        if self.map is None:
+            # Generate test cases.
+            for test_case_idx in range(1, size + 1):
+                test_case_path = test_set_path + '/' + f'{test_case_idx:02}'
+                os.mkdir(test_case_path)
+                self.mymap['dirs'].append(test_case_path)
+                self.generate_test_case(test_case_path)
+        else:
+            # Link ready generated cases.
+            for dir in self.map['dirs']:
+                os.makedirs(dir, exist_ok=True)
+            for pair in self.map['links']:
+                src = os.path.join(self.forms_path, pair[0])
+                dst = pair[1]
+                os.link(src, dst)
+            with open(expected_output_path, 'w') as f:
+                f.write(self.map['expected_output'])
+            self.mymap = self.map
+        
+        # Save the mapping for later.
+        with open(map_path, 'w') as f:
+            with open(expected_output_path) as f2:
+                 self.map['expected_output'] = f2.read()
+            json.dump(self.mymap, f)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -110,6 +141,8 @@ if __name__ == '__main__':
                         help='The number of test cases to generate.')
     parser.add_argument('--metadata', default='dataset_forms_metadata.txt',
                         help='The path of the dataset forms metadata file.')
+    parser.add_argument('--map', default=None,
+                        help='The path to map.json file to rebuild the same data')
 
     args = parser.parse_args()
-    TestsGenerator(args.metadata, args.forms).generate_test_set(args.size)
+    TestsGenerator(args.metadata, args.forms, args.map).generate_test_set(args.size)
