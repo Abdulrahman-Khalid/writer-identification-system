@@ -95,7 +95,7 @@ class TestsGenerator:
             pass
         # Generate test cases.
         for test_case_idx in range(1, size + 1):
-            test_case_path = test_set_path + '/' + str(test_case_idx)
+            test_case_path = test_set_path + '/' + f'{test_case_idx:02}'
             os.mkdir(test_case_path)
             self.generate_test_case(test_case_path)
 
