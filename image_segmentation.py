@@ -4,7 +4,7 @@ import math
 
 
 def line_segmentation(img):
-    # Apply Dilation to mix all line words or all words characters together
+    # Apply Dilation to mix all line words together
     dilation_kernel = np.ones((1, 190), np.uint8)
     image_dilation = cv2.dilate(np.invert(img), dilation_kernel, iterations=1).astype(np.uint8)
     # Remove thin vertical lines to distinct overlaped lines 
