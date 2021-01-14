@@ -1,4 +1,4 @@
-import os 
+import os
 import numpy as np
 TESTS_PATH = "data"
 
@@ -20,5 +20,8 @@ def read_test_case_images(test_case):
         for writer in writers:
             for image in os.scandir(os.path.join(root, writer)):
                 train_images_paths = np.append(train_images_paths, image.path)
-                train_images_labels = np.append(train_images_labels, int(writer))
+                train_images_labels = np.append(
+                    train_images_labels,
+                    int(writer)
+                )
     return test_image_path, train_images_paths, train_images_labels
