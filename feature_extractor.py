@@ -11,8 +11,8 @@ def get_features(gray_image, binary_image, contours, radius=3, no_points=3 * 8,
         x, y, w, h = cv2.boundingRect(contour)
         if h < 50:
             continue
-        gray_line = gray_image[y:y + h, x:x + w]
-        binary_line = binary_image[y:y + h, x:x + w]
+        gray_line = gray_image[y - 30:y + h + 60, x:x + w]
+        binary_line = binary_image[y - 30:y + h + 60, x:x + w]
         lbp = local_binary_pattern(gray_line, no_points, radius, method=method).astype(np.uint8)
         print(lbp)
         hist = cv2.calcHist([lbp], [0], binary_line, [256], [0, 256], hist, True).ravel()

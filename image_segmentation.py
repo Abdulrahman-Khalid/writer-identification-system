@@ -3,11 +3,15 @@ import numpy as np
 import math
 
 
-def line_segmentation(img):
+def line_segmentation(img, image_name):
     # Apply Dilation to mix all line words or all words characters together
-    kernel = np.ones((3, 180), np.uint8)
-    image_dilation = cv2.dilate(np.invert(img), kernel, iterations=1).astype(np.uint8)
-    lines_contours, _ = cv2.findContours(image_dilation.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    dilation_kernel = np.ones((1, 190), np.uint8)
+    image_dilation = cv2.dilate(np.invert(img), dilation_kernel, iterations=1).astype(np.uint8)
+    # Remove thin vertical lines to distinct overlaped lines 
+    vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (370,1))        
+    remove_vertical = cv2.morphologyEx(image_dilation, cv2.MORPH_OPEN, vertical_kernel)
+    # Find image contours which indicate lines 
+    lines_contours, _ = cv2.findContours(remove_vertical.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     return lines_contours
 
 
