@@ -9,6 +9,21 @@ Identify the writer of a handwritten document out of 3 writers.
 $ pip3 install -r requirements.txt
 ```
 
+## Run The Classifier
+```
+$ python3 identify_writer.py
+```
+The previous script will:
+1. Iterate over `data` directory in the current directory.
+2. Train the classifier over the training set for each patch.
+3. Identify the writer for each patch.
+4. Write output to `time.txt` and `results.txt` in the current directory.
+
+For more options:
+```
+$ python3 identify_writer.py --help
+```
+
 ## Generate Test Set
 Register and download the [IAM Dataset](https://fki.tic.heia-fr.ch/databases/iam-handwriting-database).
 
@@ -35,16 +50,6 @@ Example:
 ```
 $ python3 utils/generate_test_set.py --forms ../iam_dataset --size 100
 ```
-
-## Run The Identifier
-```
-$ python3 identify_writer.py
-```
-The previous script will:
-1. Iterate over `data` dir.
-2. Train the identifier over the training set for each patch.
-3. Identify the writer for each patch.
-4. Write output to `data/time.txt` and `data/results.txt`.
 
 ## Measure Performance
 
