@@ -11,10 +11,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     with open(args.results) as results_file:
-        results = results_file.readlines()
+        results = [result[:-1] for result in results_file.readlines() if result != '\n']
 
     with open(args.expected_output) as expected_output_file:
-        correct_writers = expected_output_file.readlines()
+        correct_writers = [writer[:-1] for writer in expected_output_file.readlines() if writer != '\n']
 
     assert len(results) == len(correct_writers), \
         'The # of produced results must be equal to the number of expected outputs'
@@ -26,8 +26,8 @@ if __name__ == '__main__':
     accuracy = correct_identifications / len(results)
 
     with open(args.time) as time_file:
-        times = time_file.readlines()
+        times = [time[:-1] for time in time_file.readlines() if time != '\n']
 
-    average_time = sum([int(time) for time in times]) / len(times)
+    average_time = sum([float(time) for time in times]) / len(times)
 
-    print('Accuracy: {}, Average time: {}'.format(accuracy, average_time))
+    print(f'Accuracy: {accuracy:.1%}, Average time: {average_time:.2f}s')
