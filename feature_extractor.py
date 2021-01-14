@@ -3,15 +3,16 @@ import cv2
 from scipy.stats import itemfreq
 from skimage.feature import local_binary_pattern
 
-def get_features(gray_image, binary_image, contours, radius=3, no_points= 3*8, method='uniform'): # try no_points = 3 * 8
+def get_features(gray_image, binary_image, contours, radius=3, no_points=3 * 8,
+                 method='uniform'):  # try no_points = 3 * 8
     features = []
     hist = np.zeros(256)
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
-        if(h < 50):
+        if h < 50:
             continue
-        gray_line = gray_image[y:y+h, x:x+w]
-        binary_line = binary_image[y:y+h, x:x+w]
+        gray_line = gray_image[y:y + h, x:x + w]
+        binary_line = binary_image[y:y + h, x:x + w]
         lbp = local_binary_pattern(gray_line, no_points, radius, method=method).astype(np.uint8)
         print(lbp)
         hist = cv2.calcHist([lbp], [0], binary_line, [256], [0, 256], hist, True).ravel()
@@ -20,10 +21,12 @@ def get_features(gray_image, binary_image, contours, radius=3, no_points= 3*8, m
 
     return features
 
+
 def is_bigger_than_center(gray_image, center, x, y):
     if x < 0 or y < 0 or x >= gray_image.shape[0] or y >= gray_image.shape[1]:
         return 0
     return 1 if gray_image[x][y] >= center else 0
+
 
 # def is_bigger_than_center(gray_image, center, x, y):
 #     try:
@@ -53,16 +56,17 @@ def lbp_pixel(gray_image, x, y, radius=3, power_of_2=[1, 2, 4, 8, 16, 32, 64, 12
     """
     pattern = 0
     center = gray_image[x][y]
-    pattern |= is_bigger_than_center(gray_image, center, x-radius, y+radius) * power_of_2[0]       # top right
-    pattern |= is_bigger_than_center(gray_image, center, x, y+radius) * power_of_2[1]              # right
-    pattern |= is_bigger_than_center(gray_image, center, x+radius, y+radius) * power_of_2[2]       # bottom_right
-    pattern |= is_bigger_than_center(gray_image, center, x+radius, y) * power_of_2[3]              # bottom
-    pattern |= is_bigger_than_center(gray_image, center, x+radius, y-radius) * power_of_2[4]       # bottom_left
-    pattern |= is_bigger_than_center(gray_image, center, x, y-radius) * power_of_2[5]              # left
-    pattern |= is_bigger_than_center(gray_image, center, x-radius, y-radius) * power_of_2[6]       # top left
-    pattern |= is_bigger_than_center(gray_image, center, x-radius, y) * power_of_2[7]              # top
-    
+    pattern |= is_bigger_than_center(gray_image, center, x - radius, y + radius) * power_of_2[0]  # top right
+    pattern |= is_bigger_than_center(gray_image, center, x, y + radius) * power_of_2[1]  # right
+    pattern |= is_bigger_than_center(gray_image, center, x + radius, y + radius) * power_of_2[2]  # bottom_right
+    pattern |= is_bigger_than_center(gray_image, center, x + radius, y) * power_of_2[3]  # bottom
+    pattern |= is_bigger_than_center(gray_image, center, x + radius, y - radius) * power_of_2[4]  # bottom_left
+    pattern |= is_bigger_than_center(gray_image, center, x, y - radius) * power_of_2[5]  # left
+    pattern |= is_bigger_than_center(gray_image, center, x - radius, y - radius) * power_of_2[6]  # top left
+    pattern |= is_bigger_than_center(gray_image, center, x - radius, y) * power_of_2[7]  # top
+
     return pattern
+
 
 def lbp_features(gray_images, binary_image, radius=3):
     lbp_features = []
@@ -80,46 +84,47 @@ def lbp_features(gray_images, binary_image, radius=3):
     lbp_features.extend(hist)
     return lbp_features
 
+
 gray_images = np.array([
-[
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7]
-],
-[
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7],
-    [1, 2, 3, 4, 5, 6, 7]
-]
+    [
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7]
+    ],
+    [
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7],
+        [1, 2, 3, 4, 5, 6, 7]
+    ]
 ], dtype=np.uint8)
 
 binary_images = np.array([
-[
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0]
-],
-[
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0]
-]
+    [
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0]
+    ],
+    [
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0]
+    ]
 ], dtype=np.uint8)
 # local_binary_pattern()
 # lbp = local_binary_pattern(gray_images[0], 8, 3, method='default')
