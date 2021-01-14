@@ -1,14 +1,15 @@
-import cv2
 import os
+import cv2
+import argparse
 import numpy as np
 from time import time
-from image_preprocessing import image_preprocessing
-from image_segmentation import line_segmentation
-from image_classification import image_classification
-from feature_extractor import get_features
-from utils import sorted_subdirectories, read_test_case_images
 from tqdm import tqdm
-import argparse
+from feature_extractor import get_features
+from image_segmentation import line_segmentation
+from image_preprocessing import image_preprocessing
+from image_classification import image_classification
+from utils import sorted_subdirectories, read_test_case_images
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
