@@ -1,5 +1,12 @@
 # Writer Identification System
 
+## Requirements
+- python3
+- python3-pip
+
+```
+$ pip3 install -r requirements.txt
+```
 
 ## Generating a Test Set From The IAM Dataset
 To generate a test set use the test set generator utility:
