@@ -1,4 +1,5 @@
 import cv2
+import os
 import numpy as np
 from time import time
 from image_preprocessing import image_preprocessing
@@ -23,7 +24,8 @@ open(args.results, "w")
 open(args.time, "w")
 
 for test_case in tqdm(test_cases, desc='Test Cases', unit='case'):
-    test_image_path, train_images_paths, train_images_labels = read_test_case_images(test_case)
+    path = os.path.join(args.data, test_case)
+    test_image_path, train_images_paths, train_images_labels = read_test_case_images(path)
     all_paths = np.append(train_images_paths, test_image_path)
 
     # read all imgs before the timer

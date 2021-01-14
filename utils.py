@@ -1,7 +1,5 @@
 import os
 import numpy as np
-TESTS_PATH = "data"
-
 
 def sorted_subdirectories(path):
     return sorted([f.name for f in os.scandir(path) if f.is_dir()], key=lambda x: int(x))
@@ -11,8 +9,7 @@ def directory_files(path):
     return [f.path for f in os.scandir(path) if f.is_file()]
 
 
-def read_test_case_images(test_case):
-    path = "/".join((TESTS_PATH, test_case))
+def read_test_case_images(path):
     test_image_path = directory_files(path)[0]
     train_images_paths = np.array([])
     train_images_labels = np.array([])
