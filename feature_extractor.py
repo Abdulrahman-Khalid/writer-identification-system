@@ -8,8 +8,7 @@ from skimage.feature import local_binary_pattern
 # no_points = 8 and radius = 3 and method = 'default' ----> Accuracy: 100.0%, Average time: 9.73s
 def get_features(gray_lines, binary_lines, radius=3, no_points=8,
                  method='default', verbose=False):
-    features = []
-    hist = np.zeros(256)
+    features = np.zeros(256)
 
     for idx in range(len(gray_lines)):
         gray_line = gray_lines[idx]
@@ -17,10 +16,9 @@ def get_features(gray_lines, binary_lines, radius=3, no_points=8,
         lbp = local_binary_pattern(gray_line, no_points, radius, method=method).astype(np.uint8)
         # if verbose:
         #     print(lbp)
-        hist = cv2.calcHist([lbp], [0], binary_line, [256], [0, 256], hist, True).ravel()
+        features = cv2.calcHist([lbp], [0], binary_line, [256], [0, 256], hist, True).ravel()
         
-    hist /= np.mean(hist)
-    features.extend(hist)
+    features /= np.mean(hist)
 
     return features
 
