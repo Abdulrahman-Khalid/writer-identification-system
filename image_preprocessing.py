@@ -49,8 +49,8 @@ def image_preprocessing(gray_image):
     for idx, value in enumerate(y_values):
         if value > document_median:
             y_lowerline = value
-            y_upperline = y_values[idx - 1] if idx != 0 and y_values[idx -
-                                                                     1] < document_median else y_upperline
+            y_upperline = y_values[idx - 1] if idx != 0 \
+                and y_values[idx - 1] < document_median else y_upperline
             break
 
     gray_image = gray_image[y_upperline:y_lowerline-3, :]
