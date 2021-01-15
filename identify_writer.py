@@ -8,14 +8,32 @@ from feature_extractor import get_features
 from image_segmentation import line_segmentation
 from image_preprocessing import image_preprocessing
 from image_classification import image_classification
-from utils import sorted_subdirectories, read_test_case_images
 
+
+def sorted_subdirectories(path):
+    return sorted([f.name for f in os.scandir(path) if f.is_dir()], key=lambda x: int(x))
+
+
+def directory_files(path):
+    return [f.path for f in os.scandir(path) if f.is_file()]
+
+
+def read_test_case_images(path):
+    train_images_paths = []
+    train_images_labels = []
+    test_image_path = directory_files(path)[0]
+    for root, writers, _ in os.walk(path, topdown=False):
+        for writer in writers:
+            for image in os.scandir(os.path.join(root, writer)):
+                train_images_paths.append(image.path)
+                train_images_labels.append(int(writer))
+    return test_image_path, train_images_paths, train_images_labels
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
     parser.add_argument('--data', help='path to data dir', default='data')
-    parser.add_argument('--results', help='path to results output file', default='results.txt')
+    parser.add_argument('--results', help='path to results output file', default='results/results.txt')
     parser.add_argument('--time', help='path to time output file', default='time.txt')
     args = parser.parse_args()
 
