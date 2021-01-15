@@ -8,6 +8,7 @@ venv
 correct_writers.txt
 results.txt
 time.txt
+data
 
 # from https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 # Byte-compiled / optimized / DLL files

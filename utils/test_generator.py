@@ -14,16 +14,17 @@ class TestsGenerator:
         test_set_path='data', test_form_name='test',
         forms_extension='.png', test_samples_per_writer=2, writers_per_test=3):
 
-        self.writers_forms = defaultdict(lambda: [])
-        self.read_metadata(metadata_path)
-        self.forms_path = forms_path
-
         self.expected_output_path = expected_output_path
         self.test_set_path = test_set_path
         self.test_form_name = test_form_name
         self.forms_extension = forms_extension
         self.test_samples_per_writer = test_samples_per_writer
         self.writers_per_test = writers_per_test
+        self.forms_path = forms_path
+        self.writers_forms = defaultdict(lambda: [])
+
+        self.read_metadata(metadata_path)
+
 
     def read_metadata(self, metadata_file_path):
         # Get the form ids for each writer.
@@ -37,14 +38,14 @@ class TestsGenerator:
 
         # Filter out writer with no enough forms to construct a test case.
         self.writers_forms = {writer: forms for writer, forms in self.writers_forms.items()
-                              if len(forms) >= test_samples_per_writer}
+                              if len(forms) >= self.test_samples_per_writer}
 
     def pick_test_writers(self):
         # Testable writers are writers that have enough forms for test case samples + 1 test form.
         non_testable_writers = \
-            [writer for writer, forms in self.writers_forms.items() if len(forms) < test_samples_per_writer + 1]
+            [writer for writer, forms in self.writers_forms.items() if len(forms) < self.test_samples_per_writer + 1]
         testable_writers = \
-            [writer for writer, forms in self.writers_forms.items() if len(forms) >= test_samples_per_writer + 1]
+            [writer for writer, forms in self.writers_forms.items() if len(forms) >= self.test_samples_per_writer + 1]
 
         # Decide how many writers to pick out of each group, we need at least one testable writer.
         testable_writers_count = 1 + random.choice(range(self.writers_per_test))
@@ -71,20 +72,20 @@ class TestsGenerator:
                     expected_output_file.write(str(writer_idx) + '\n')
 
                 # Sample an extra form of the correct writer to use as the test form.
-                sample_forms = random.sample(self.writers_forms[writer], test_samples_per_writer + 1)
+                sample_forms = random.sample(self.writers_forms[writer], self.test_samples_per_writer + 1)
                 test_form = sample_forms.pop()
 
                 # Create the test form hard link.
-                src = self.forms_path + '/' + test_form + forms_extension
-                dst = test_case_path + '/' + self.test_form_name + forms_extension
+                src = self.forms_path + '/' + test_form + self.forms_extension
+                dst = test_case_path + '/' + self.test_form_name + self.forms_extension
                 os.link(src, dst)
             else:
-                sample_forms = random.sample(self.writers_forms[writer], test_samples_per_writer)
+                sample_forms = random.sample(self.writers_forms[writer], self.test_samples_per_writer)
 
             # Create hard links of the writer's sample forms.
             for form_idx, sample_form in enumerate(sample_forms, 1):
-                src = self.forms_path + '/' + sample_form + forms_extension
-                dst = test_writer_path + '/' + str(form_idx) + forms_extension
+                src = self.forms_path + '/' + sample_form + self.forms_extension
+                dst = test_writer_path + '/' + str(form_idx) + self.forms_extension
                 os.link(src, dst)
 
     def generate_test_set(self, size):
