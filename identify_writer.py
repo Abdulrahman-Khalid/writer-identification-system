@@ -4,10 +4,11 @@ import argparse
 import numpy as np
 from time import time
 from tqdm import tqdm
-from feature_extractor import get_features, lbp_features
+from feature_extractor import get_features
 from image_segmentation import line_segmentation
 from image_preprocessing import image_preprocessing
 from image_classification import image_classification
+from skimage.feature import hog
 
 
 def sorted_subdirectories(path):
@@ -29,12 +30,50 @@ def read_test_case_images(path):
                 train_images_labels.append(int(writer))
     return test_image_path, train_images_paths, train_images_labels
 
+
+def resize(img, scale):
+    width = int(img.shape[1] * scale / 100)
+    height = int(img.shape[0] * scale / 100)
+    return cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
+
+
+def hog_pipeline(gray_image, **kwargs):
+    binary_image, _ = image_preprocessing(gray_image)
+    return hog(resize(binary_image, 40), feature_vector=True, block_norm='L2-Hys')[:1000]
+
+
+def hu_moments_pipeline(gray_image, **kwargs):
+    binary_image, gray_image = image_preprocessing(gray_image)
+    binary_lines, _ = line_segmentation(binary_image, gray_image)
+    hus = []
+    for line in binary_lines:
+        hus.extend(cv2.HuMoments(cv2.moments(line)).flatten())
+    return hus[:7*4]
+
+def hu_hog(gray_image, **kwargs):
+    return list(hu_moments_pipeline(gray_image)) + list(hog_pipeline(gray_image))
+
+def lbp_pipeline(gray_image, **kwargs):
+    binary_image, gray_image = image_preprocessing(gray_image)
+    binary_lines, gray_lines = line_segmentation(binary_image, gray_image)
+    # feature_vector = lbp_features(gray_lines, binary_lines)
+    return get_features(gray_lines, binary_lines, verbose=kwargs['verbose'])
+
+
+pipelines = {
+    'lbp': lbp_pipeline,
+    'hog': hog_pipeline,
+    'hu': hu_moments_pipeline,
+    'hu+hog': hu_hog,
+}
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
     parser.add_argument('--data', help='path to data dir', default='data')
     parser.add_argument('--results', help='path to results output file', default='results.txt')
     parser.add_argument('--time', help='path to time output file', default='time.txt')
+    parser.add_argument('--pipeline', default='lbp', choices=list(pipelines.keys()))
     args = parser.parse_args()
 
     test_cases = sorted_subdirectories(args.data)
@@ -42,6 +81,8 @@ if __name__ == "__main__":
     # clear files
     open(args.results, "w")
     open(args.time, "w")
+
+    pipeline = pipelines[args.pipeline]
 
     for test_case in tqdm(test_cases, desc='Test Cases', unit='case'):
         path = os.path.join(args.data, test_case)
@@ -61,10 +102,7 @@ if __name__ == "__main__":
 
         time_before = time()
         for gray_image, is_test_img in all_imgs:
-            binary_image, gray_image = image_preprocessing(gray_image)
-            binary_lines, gray_lines = line_segmentation(binary_image, gray_image)
-            feature_vector = get_features(gray_lines, binary_lines, verbose=args.verbose)
-            # feature_vector = lbp_features(gray_lines, binary_lines)
+            feature_vector = pipeline(gray_image, verbose=args.verbose)
 
             if is_test_img:
                 test_image_features.append(feature_vector)
