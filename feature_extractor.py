@@ -5,7 +5,6 @@ from skimage.feature import local_binary_pattern
 
 def get_features(gray_lines, binary_lines, radius=3, no_points=3 * 8,
                  method='uniform', verbose=False):
-    features = []
     hist = np.zeros(256)
 
     for idx in range(len(gray_lines)):
@@ -17,9 +16,8 @@ def get_features(gray_lines, binary_lines, radius=3, no_points=3 * 8,
         hist = cv2.calcHist([lbp], [0], binary_line, [256], [0, 256], hist, True).ravel()
         
     hist /= np.mean(hist)
-    features.extend(hist)
 
-    return features
+    return hist
 
 
 def is_bigger_than_center(gray_image, center, x, y):
