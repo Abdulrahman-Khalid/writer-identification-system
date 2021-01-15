@@ -48,7 +48,7 @@ and is named `dataset_forms_metadata.txt`.
 Example:
 
 ```
-$ python3 utils/generate_test_set.py --forms ../iam_dataset --size 100
+$ python3 utils/generate_test_set.py --forms iam_dataset --size 1000
 ```
 
 ## Measure Performance
