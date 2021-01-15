@@ -38,9 +38,12 @@ def resize(img, scale):
 
 
 def hog_pipeline(gray_image, **kwargs):
-    binary_image, _ = image_preprocessing(gray_image)
+    if 'binary_image' in kwargs:
+        binary_image = kwargs['binary_image']
+    else:
+        binary_image, _ = image_preprocessing(gray_image)
+    
     return hog(resize(binary_image, 40), feature_vector=True, block_norm='L2-Hys')[:1000]
-
 
 def hu_moments_pipeline(gray_image, **kwargs):
     binary_image, gray_image = image_preprocessing(gray_image)
@@ -50,8 +53,34 @@ def hu_moments_pipeline(gray_image, **kwargs):
         hus.extend(cv2.HuMoments(cv2.moments(line)).flatten())
     return hus[:7*4]
 
+def hu_moments_window_pipeline(gray_image, **kwargs):
+    if 'binary_image' in kwargs:
+        binary_image = kwargs['binary_image']
+    else:
+        binary_image, _ = image_preprocessing(gray_image)
+    size = kwargs.get('size', 70000)
+    wsize = 13
+
+    hus = []
+    x, y = binary_image.shape
+    for i in range(0, x, wsize):
+        for j in range(0, y, wsize):
+            window = binary_image[i:i+wsize, j:j+wsize]
+            hus.extend(cv2.HuMoments(cv2.moments(window)).flatten())
+            if len(hus) >= size: return hus[:size]
+    return hus[:size]
+
 def hu_hog(gray_image, **kwargs):
-    return list(hu_moments_pipeline(gray_image)) + list(hog_pipeline(gray_image))
+    binary_image, _ = image_preprocessing(gray_image)
+    a = list(hu_moments_pipeline(gray_image))
+    b = list(hog_pipeline(gray_image, binary_image=binary_image))
+    return a + b
+
+def huw_hog(gray_image, **kwargs):
+    binary_image, _ = image_preprocessing(gray_image)
+    a = list(hu_moments_window_pipeline(gray_image, binary_image=binary_image, size=1000))
+    b = list(hog_pipeline(gray_image, binary_image=binary_image))
+    return a + b
 
 def lbp_pipeline(gray_image, **kwargs):
     binary_image, gray_image = image_preprocessing(gray_image)
@@ -64,7 +93,9 @@ pipelines = {
     'lbp': lbp_pipeline,
     'hog': hog_pipeline,
     'hu': hu_moments_pipeline,
+    'huw': hu_moments_window_pipeline,
     'hu+hog': hu_hog,
+    'huw+hog': huw_hog,
 }
 
 if __name__ == "__main__":
