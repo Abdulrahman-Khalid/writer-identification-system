@@ -17,13 +17,17 @@ def image_preprocessing(gray_image):
     for i in range(lines.shape[0]):
         y_values.append(lines[i][0][1])
     
+    # Initialize upper and lower lines with heuristic values in case of hough failure
+    y_lowerline = 2800
+    y_upperline = 650
+
     # Detect upper and lower lines that contains the handwritten text
     y_values.sort()
     document_median = gray_image.shape[1] // 2
     for idx, value in enumerate(y_values):
         if value > document_median:
             y_lowerline = value
-            y_upperline = y_values[idx - 1]
+            y_upperline = y_values[idx - 1] if idx != 0 and y_values[idx - 1] < document_median else y_upperline
             break
 
     gray_image = gray_image[y_upperline + 3: y_lowerline - 3,:]

@@ -62,8 +62,8 @@ if __name__ == "__main__":
         time_before = time()
         for gray_image, is_test_img in all_imgs:
             binary_image, gray_image = image_preprocessing(gray_image)
-            lines_boxes = line_segmentation(binary_image)
-            feature_vector = get_features(gray_image, binary_image, lines_boxes, verbose=args.verbose)
+            binary_lines, gray_lines = line_segmentation(binary_image, gray_image)
+            feature_vector = get_features(gray_lines, binary_lines, verbose=args.verbose)
 
             if is_test_img:
                 test_image_features.append(feature_vector)

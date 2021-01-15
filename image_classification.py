@@ -1,7 +1,7 @@
 from sklearn import svm
+import numpy as np
 
-
-def image_classification(train_images_features, train_images_labels, test_image_features, kernel="rbf"):
+def image_classification(train_images_features, train_images_labels, test_image_features, kernel="sigmoid"):
     if kernel == "linear":
         linear = svm.SVC(kernel='linear', C=1, decision_function_shape='ovo')
         linear = linear.fit(train_images_features, train_images_labels)

@@ -3,23 +3,26 @@ import math
 import numpy as np
 
 
-def line_segmentation(img):
+def line_segmentation(binary_image, gray_image):
     # Apply Dilation to mix all line words together
     dilation_kernel = np.ones((1, 190), np.uint8)
-    image_dilation = cv2.dilate(np.invert(img), dilation_kernel, iterations=1).astype(np.uint8)
+    image_dilation = cv2.dilate(np.invert(binary_image), dilation_kernel, iterations=1).astype(np.uint8)
     # Remove thin vertical lines to distinct overlaped lines 
     vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (370,1))
     remove_vertical = cv2.morphologyEx(image_dilation, cv2.MORPH_OPEN, vertical_kernel)
     # Find image contours which indicate lines 
     lines_contours, _ = cv2.findContours(remove_vertical.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Extract boundry boxes
-    lines_boxes = []
+    # Extract lines
+    binary_lines = []
+    gray_lines = []
     for line in lines_contours:
         x, y, w, h = cv2.boundingRect(line)
         if h > 30:
-            lines_boxes.append((max(y-30, 0), min(y+h+60, img.shape[1]), x, x+w))
-    return lines_boxes
+            binary_lines.append(binary_image[max(y-30, 0):min(y+h+60, binary_image.shape[1]), x:x+w])
+            gray_lines.append(gray_image[max(y-30, 0):min(y+h+60, gray_image.shape[1]), x:x+w])
+    
+    return binary_lines, gray_lines
 
 
 def create_kernel(kernel_size, sigma, theta):
