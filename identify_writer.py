@@ -1,14 +1,16 @@
-import os
-import cv2
 import argparse
-import numpy as np
+import os
 from time import time
-from tqdm import tqdm
-from feature_extractor import get_features
-from image_segmentation import line_segmentation
-from image_preprocessing import image_preprocessing
-from image_classification import image_classification
+
+import cv2
+import numpy as np
 from skimage.feature import hog
+from tqdm import tqdm
+
+from feature_extractor import get_features
+from image_classification import image_classification
+from image_preprocessing import image_preprocessing
+from image_segmentation import line_segmentation
 
 
 def sorted_subdirectories(path):
@@ -42,8 +44,9 @@ def hog_pipeline(gray_image, **kwargs):
         binary_image = kwargs['binary_image']
     else:
         binary_image, _ = image_preprocessing(gray_image)
-    
+
     return hog(resize(binary_image, 40), feature_vector=True, block_norm='L2-Hys')[:1000]
+
 
 def hu_moments_pipeline(gray_image, **kwargs):
     binary_image, gray_image = image_preprocessing(gray_image)
@@ -52,6 +55,7 @@ def hu_moments_pipeline(gray_image, **kwargs):
     for line in binary_lines:
         hus.extend(cv2.HuMoments(cv2.moments(line)).flatten())
     return hus[:7*4]
+
 
 def hu_moments_window_pipeline(gray_image, **kwargs):
     if 'binary_image' in kwargs:
@@ -67,8 +71,10 @@ def hu_moments_window_pipeline(gray_image, **kwargs):
         for j in range(0, y, wsize):
             window = binary_image[i:i+wsize, j:j+wsize]
             hus.extend(cv2.HuMoments(cv2.moments(window)).flatten())
-            if len(hus) >= size: return hus[:size]
+            if len(hus) >= size:
+                return hus[:size]
     return hus[:size]
+
 
 def hu_hog(gray_image, **kwargs):
     binary_image, _ = image_preprocessing(gray_image)
@@ -76,17 +82,22 @@ def hu_hog(gray_image, **kwargs):
     b = list(hog_pipeline(gray_image, binary_image=binary_image))
     return a + b
 
+
 def huw_hog(gray_image, **kwargs):
     binary_image, _ = image_preprocessing(gray_image)
-    a = list(hu_moments_window_pipeline(gray_image, binary_image=binary_image, size=1000))
+    a = list(hu_moments_window_pipeline(
+        gray_image,
+        binary_image=binary_image,
+        size=1000
+    ))
     b = list(hog_pipeline(gray_image, binary_image=binary_image))
     return a + b
+
 
 def lbp_pipeline(gray_image, **kwargs):
     binary_image, gray_image = image_preprocessing(gray_image)
     binary_lines, gray_lines = line_segmentation(binary_image, gray_image)
-    # feature_vector = lbp_features(gray_lines, binary_lines)
-    return get_features(gray_lines, binary_lines, verbose=kwargs['verbose'])
+    return get_features(gray_lines, binary_lines)
 
 
 pipelines = {
@@ -100,11 +111,13 @@ pipelines = {
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
     parser.add_argument('--data', help='path to data dir', default='data')
-    parser.add_argument('--results', help='path to results output file', default='results.txt')
-    parser.add_argument('--time', help='path to time output file', default='time.txt')
-    parser.add_argument('--pipeline', default='lbp', choices=list(pipelines.keys()))
+    parser.add_argument('--results',
+                        help='path to results output file', default='results.txt')
+    parser.add_argument('--time',
+                        help='path to time output file', default='time.txt')
+    parser.add_argument('--pipeline', default='lbp',
+                        choices=list(pipelines.keys()))
     args = parser.parse_args()
 
     test_cases = sorted_subdirectories(args.data)
@@ -117,12 +130,14 @@ if __name__ == "__main__":
 
     for test_case in tqdm(test_cases, desc='Test Cases', unit='case'):
         path = os.path.join(args.data, test_case)
-        test_image_path, train_images_paths, train_images_labels = read_test_case_images(path)
+        test_image_path, train_images_paths, \
+            train_images_labels = read_test_case_images(path)
         all_paths = np.append(train_images_paths, test_image_path)
 
         # read all imgs before the timer
         all_imgs = [
-            (cv2.imread(image_path, cv2.IMREAD_GRAYSCALE), image_path == test_image_path)
+            (cv2.imread(image_path, cv2.IMREAD_GRAYSCALE),
+             image_path == test_image_path)
             for image_path in all_paths
         ]
 
@@ -133,7 +148,7 @@ if __name__ == "__main__":
 
         time_before = time()
         for gray_image, is_test_img in all_imgs:
-            feature_vector = pipeline(gray_image, verbose=args.verbose)
+            feature_vector = pipeline(gray_image)
 
             if is_test_img:
                 test_image_features.append(feature_vector)
@@ -141,8 +156,8 @@ if __name__ == "__main__":
                 train_images_features.append(feature_vector)
 
         predictions = image_classification(
-            np.array(train_images_features), 
-            train_images_labels, 
+            np.array(train_images_features),
+            train_images_labels,
             np.array(test_image_features)
         )
         test_time = time() - time_before
