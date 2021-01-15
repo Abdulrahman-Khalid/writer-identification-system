@@ -16,7 +16,7 @@ def show_image(image, window_name='image', save_name='image.png'):
 
 def image_preprocessing(gray_image):
     # Apply gaussian blur to reduce noise
-    gray_image = cv2.GaussianBlur(gray_image, (5, 5), 0)
+    cv2.GaussianBlur(gray_image, (5, 5), 0, dst=gray_image)
 
     # Remove document left and right margins
     gray_image = gray_image[:, 100:-30]

@@ -94,15 +94,15 @@ def huw_hog(gray_image, **kwargs):
     return a + b
 
 
-def lbp_pipeline(gray_image, **kwargs):
+def lbp_pipeline(gray_image, out):
     binary_image, gray_image = image_preprocessing(gray_image)
     binary_lines, gray_lines = line_segmentation(binary_image, gray_image)
-    return get_features(gray_lines, binary_lines)
+    return get_features(gray_lines, binary_lines, out)
 
 
 def all_features_opt(all_imgs, out):
     for i in range(len(all_imgs)):
-        out[i] = lbp_pipeline(all_imgs[i])
+        out[i] = lbp_pipeline(all_imgs[i], out[i])
 
 
 def all_features(all_imgs, pipeline):
