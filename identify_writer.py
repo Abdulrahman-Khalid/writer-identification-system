@@ -43,8 +43,8 @@ for test_case in tqdm(test_cases, desc='Test Cases', unit='case'):
     time_before = time()
     for gray_image, is_test_img in all_imgs:
         binary_image, gray_image = image_preprocessing(gray_image)
-        line_contours = line_segmentation(binary_image)
-        feature_vector = get_features(gray_image, binary_image, line_contours, verbose=args.verbose)
+        lines_boxes = line_segmentation(binary_image)
+        feature_vector = get_features(gray_image, binary_image, lines_boxes, verbose=args.verbose)
 
         if is_test_img:
             test_image_features.append(feature_vector)

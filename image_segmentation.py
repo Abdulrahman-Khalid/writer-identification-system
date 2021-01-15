@@ -12,7 +12,14 @@ def line_segmentation(img):
     remove_vertical = cv2.morphologyEx(image_dilation, cv2.MORPH_OPEN, vertical_kernel)
     # Find image contours which indicate lines 
     lines_contours, _ = cv2.findContours(remove_vertical.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    return lines_contours
+    
+    # Extract boundry boxes
+    lines_boxes = []
+    for line in lines_contours:
+        x, y, w, h = cv2.boundingRect(line)
+        if h > 30:
+            lines_boxes.append((max(y-30, 0), min(y+h+60, img.shape[1]), x, x+w))
+    return lines_boxes
 
 
 def create_kernel(kernel_size, sigma, theta):
