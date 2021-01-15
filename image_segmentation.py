@@ -4,9 +4,10 @@ import numpy as np
 
 
 def line_segmentation(binary_image, gray_image):
+    
     # Apply Dilation to mix all line words together
     dilation_kernel = np.ones((1, 190), np.uint8)
-    image_dilation = cv2.dilate(np.invert(binary_image), dilation_kernel, iterations=1).astype(np.uint8)
+    image_dilation = cv2.dilate(binary_image, dilation_kernel, iterations=1).astype(np.uint8)
     # Remove thin vertical lines to distinct overlaped lines 
     vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (370,1))
     remove_vertical = cv2.morphologyEx(image_dilation, cv2.MORPH_OPEN, vertical_kernel)
@@ -21,7 +22,7 @@ def line_segmentation(binary_image, gray_image):
         if h > 30:
             binary_lines.append(binary_image[max(y-30, 0):min(y+h+60, binary_image.shape[1]), x:x+w])
             gray_lines.append(gray_image[max(y-30, 0):min(y+h+60, gray_image.shape[1]), x:x+w])
-    
+
     return binary_lines, gray_lines
 
 
