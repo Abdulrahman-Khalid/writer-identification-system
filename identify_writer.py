@@ -33,7 +33,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
     parser.add_argument('--data', help='path to data dir', default='data')
-    parser.add_argument('--results', help='path to results output file', default='results/results.txt')
+    parser.add_argument('--results', help='path to results output file', default='results.txt')
     parser.add_argument('--time', help='path to time output file', default='time.txt')
     args = parser.parse_args()
 
