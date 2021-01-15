@@ -100,6 +100,15 @@ def lbp_pipeline(gray_image, **kwargs):
     return get_features(gray_lines, binary_lines)
 
 
+def all_features_opt(all_imgs, out):
+    for i in range(len(all_imgs)):
+        out[i] = lbp_pipeline(all_imgs[i])
+
+
+def all_features(all_imgs, pipeline):
+    return np.array([pipeline(img) for img in all_imgs])
+
+
 pipelines = {
     'lbp': lbp_pipeline,
     'hog': hog_pipeline,
@@ -126,41 +135,38 @@ if __name__ == "__main__":
     open(args.results, "w")
     open(args.time, "w")
 
-    pipeline = pipelines[args.pipeline]
-
     for test_case in tqdm(test_cases, desc='Test Cases', unit='case'):
         path = os.path.join(args.data, test_case)
         test_image_path, train_images_paths, \
             train_images_labels = read_test_case_images(path)
-        all_paths = np.append(train_images_paths, test_image_path)
 
         # read all imgs before the timer
         all_imgs = [
-            (cv2.imread(image_path, cv2.IMREAD_GRAYSCALE),
-             image_path == test_image_path)
-            for image_path in all_paths
+            cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+            for image_path in [*train_images_paths, test_image_path]
         ]
 
-        # faster to use list.append, then np.array it
-        # than using np.append with numpy arrays
-        train_images_features = []
-        test_image_features = []
+        # allocate buffer ahead
+        features = np.zeros((len(all_imgs), 256))
 
+        # ------ start timer ------ #
         time_before = time()
-        for gray_image, is_test_img in all_imgs:
-            feature_vector = pipeline(gray_image)
 
-            if is_test_img:
-                test_image_features.append(feature_vector)
-            else:
-                train_images_features.append(feature_vector)
+        if args.pipeline == 'lbp':
+            all_features_opt(all_imgs, features)
+        else:
+            features = all_features(all_imgs, pipelines[args.pipeline])
 
+        train_images_features = features[:-1]
+        test_image_features = np.array([features[-1]])
         predictions = image_classification(
-            np.array(train_images_features),
+            train_images_features,
             train_images_labels,
-            np.array(test_image_features)
+            test_image_features,
         )
+
         test_time = time() - time_before
+        # ------ end timer ------ #
 
         with open(args.results, "a") as f:
             f.write(f'{int(predictions[0])}\n')
