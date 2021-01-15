@@ -3,8 +3,11 @@ import cv2
 from scipy.stats import itemfreq
 from skimage.feature import local_binary_pattern
 
-def get_features(gray_lines, binary_lines, radius=3, no_points=3 * 8,
-                 method='uniform', verbose=False):
+# no_points = 8 and radius = 3 and method = 'uniform' ----> Accuracy: 85.0%, Average time: 12.17s
+# no_points = 8*3 and radius = 3 and method = 'uniform' ----> accuracy = 90%
+# no_points = 8 and radius = 3 and method = 'default' ----> Accuracy: 100.0%, Average time: 9.73s
+def get_features(gray_lines, binary_lines, radius=3, no_points=8,
+                 method='default', verbose=False):
     features = []
     hist = np.zeros(256)
 
@@ -12,8 +15,8 @@ def get_features(gray_lines, binary_lines, radius=3, no_points=3 * 8,
         gray_line = gray_lines[idx]
         binary_line = binary_lines[idx]
         lbp = local_binary_pattern(gray_line, no_points, radius, method=method).astype(np.uint8)
-        if verbose:
-            print(lbp)
+        # if verbose:
+        #     print(lbp)
         hist = cv2.calcHist([lbp], [0], binary_line, [256], [0, 256], hist, True).ravel()
         
     hist /= np.mean(hist)
@@ -68,7 +71,7 @@ def lbp_pixel(gray_image, x, y, radius=3, power_of_2=[1, 2, 4, 8, 16, 32, 64, 12
     return pattern
 
 
-def lbp_features(gray_images, binary_image, radius=3, verbose=False):
+def lbp_features(gray_images, binary_images, radius=3, verbose=False):
     lbp_features = []
     hist = np.zeros(256)
     power_of_2 = [1, 2, 4, 8, 16, 32, 64, 128]
@@ -79,7 +82,7 @@ def lbp_features(gray_images, binary_image, radius=3, verbose=False):
             for j in range(gray_images[idx].shape[1]):
                 lbp_image[i, j] = lbp_pixel(gray_images[idx], i, j, radius, power_of_2)
         if verbose: print(idx, ":", lbp_image)
-        hist = cv2.calcHist([lbp_image], [0], binary_image[idx], [256], [0, 256], hist, True).ravel()
+        hist = cv2.calcHist([lbp_image], [0], binary_images[idx], [256], [0, 256], hist, True).ravel()
     hist /= np.mean(hist)
     lbp_features.extend(hist)
     return lbp_features
