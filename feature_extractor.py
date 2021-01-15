@@ -3,9 +3,17 @@ import cv2
 from scipy.stats import itemfreq
 from skimage.feature import local_binary_pattern
 
-# no_points = 8 and radius = 3 and method = 'uniform' ----> Accuracy: 85.0%, Average time: 12.17s
+# 20 examples
 # no_points = 8*3 and radius = 3 and method = 'uniform' ----> accuracy = 90%
+# no_points = 8 and radius = 3 and method = 'uniform' ----> Accuracy: 85.0%, Average time: 12.17s
+# no_points = 8 and radius = 3 and method = 'uniform' ----> Accuracy: 90.0%, Average time: 9.64s
 # no_points = 8 and radius = 3 and method = 'default' ----> Accuracy: 100.0%, Average time: 9.73s
+# no_points = 4 and radius = 3 and method = 'default' ----> Accuracy: 100.0%, Average time: 8.34s
+# no_points = 2 and radius = 3 and method = 'default' ----> Accuracy: 80.0%, Average time: 4.50s
+# no_points = 1 and radius = 3 and method = 'default' ----> Accuracy: 90.0%, Average time: 5.45s
+# no_points = 4 and radius = 3 and method = 'ror' ----> Accuracy: 90.0%, Average time: 7.78s
+# 100 examples
+# no_points = 4 and radius = 3 and method = 'default' ----> Accuracy: 98.0%, Average time: 6.56s
 def get_features(gray_lines, binary_lines, radius=3, no_points=4,
                  method='default', verbose=False):
     features = np.zeros(256)
@@ -17,7 +25,7 @@ def get_features(gray_lines, binary_lines, radius=3, no_points=4,
         # if verbose:
         #     print(lbp)
         features = cv2.calcHist([lbp], [0], binary_line, [256], [0, 256], features, True).ravel()
-        
+
     features /= np.mean(features)
 
     return features
