@@ -14,7 +14,8 @@ from skimage.feature import local_binary_pattern
 # no_points = 4 and radius = 3 and method = 'ror' ----> Accuracy: 90.0%, Average time: 7.78s
 # 100 examples
 # no_points = 4 and radius = 3 and method = 'default' ----> Accuracy: 98.0%, Average time: 6.56s
-def get_features(gray_lines, binary_lines, radius=3, no_points=4,
+# no_points = 4 and radius = 3 and method = 'default' with not inverted binary image ----> Accuracy: 70.0%, Average time: 5.14s
+def get_features(gray_lines, binary_lines, radius=3, no_points=8,
                  method='default', verbose=False):
     features = np.zeros(256)
 

@@ -32,6 +32,8 @@ def image_preprocessing(gray_image):
     # Detect horizontal lines
     lines = cv2.HoughLinesP(edges, rho=1, theta=np.pi/180, threshold=300, lines=np.array([]), minLineLength=80, maxLineGap=1)
 
+    print(len(lines))
+
     y_values = []
     for i in range(lines.shape[0]):
         y_values.append(lines[i][0][1])
