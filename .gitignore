@@ -5,10 +5,8 @@ preprocessed_images/
 testing.py
 .idea
 venv
-correct_writers.txt
-results.txt
-time.txt
 data
+*.txt
 *.png
 # from https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 # Byte-compiled / optimized / DLL files

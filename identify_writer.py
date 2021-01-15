@@ -4,7 +4,7 @@ import argparse
 import numpy as np
 from time import time
 from tqdm import tqdm
-from feature_extractor import get_features
+from feature_extractor import get_features, lbp_features
 from image_segmentation import line_segmentation
 from image_preprocessing import image_preprocessing
 from image_classification import image_classification
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
     parser.add_argument('--data', help='path to data dir', default='data')
-    parser.add_argument('--results', help='path to results output file', default='results/results.txt')
+    parser.add_argument('--results', help='path to results output file', default='results.txt')
     parser.add_argument('--time', help='path to time output file', default='time.txt')
     args = parser.parse_args()
 
@@ -64,6 +64,7 @@ if __name__ == "__main__":
             binary_image, gray_image = image_preprocessing(gray_image)
             binary_lines, gray_lines = line_segmentation(binary_image, gray_image)
             feature_vector = get_features(gray_lines, binary_lines, verbose=args.verbose)
+            # feature_vector = lbp_features(gray_lines, binary_lines)
 
             if is_test_img:
                 test_image_features.append(feature_vector)
