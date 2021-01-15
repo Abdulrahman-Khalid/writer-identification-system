@@ -1,6 +1,6 @@
 import cv2
-import numpy as np
 import math
+import numpy as np
 
 
 def line_segmentation(img):
@@ -8,11 +8,11 @@ def line_segmentation(img):
     dilation_kernel = np.ones((1, 190), np.uint8)
     image_dilation = cv2.dilate(np.invert(img), dilation_kernel, iterations=1).astype(np.uint8)
     # Remove thin vertical lines to distinct overlaped lines 
-    vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (370,1))        
+    vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (370,1))
     remove_vertical = cv2.morphologyEx(image_dilation, cv2.MORPH_OPEN, vertical_kernel)
     # Find image contours which indicate lines 
     lines_contours, _ = cv2.findContours(remove_vertical.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
+
     # Extract boundry boxes
     lines_boxes = []
     for line in lines_contours:
