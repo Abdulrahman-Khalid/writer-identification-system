@@ -1,11 +1,21 @@
 #!/bin/bash
 DIRECTORY=~/.pypy3
 VENV_DIRECTORY=~/.team1
-VERSION=pypy3.6-v7.3.0-linux64
+VERSION=pypy3.7-v7.3.3-linux64
 
+# source ~/.bashrc
+# team1
 # step 1: sudo apt install virtualenv;
-# step 3: pip3 install -r requirements.txt
+# sudo apt-get install pypy3-dev
+# step 3: pypy3 -m pip install -r requirements.txt
+# pypy3 -m ensurepip
+# pypy3 -m pip install numpy
+# pypy3 -m pip install scikit-build
+# pypy3 -m pip install dlib
+# step 4: CMAKE_ARGS="-D PYTHON3_LIBRARY=~/.pypy3.6-7.3.0/lib/libpypy-c.so" python3 setup.py bdist_wheel
+# pypy3 -m pip install dist/**.wheel
 
+# cmake -D PYTHON3_LIBRARY=~/.pypy3.6-7.3.0/lib/libpypy-c.so -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D OPENCV_GENERATE_PKGCONFIG=ON -D OPENCV_EXTRA_MODULES_PATH=~/opencv_build/opencv_contrib/modules
 # Download (or use existing) pypy3
 if [ -d "$DIRECTORY" ]; then
     echo "Skipping PyPy download, already exists"
