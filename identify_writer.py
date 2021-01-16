@@ -148,7 +148,7 @@ if __name__ == "__main__":
         test_time = time() - time_before
 
         with open(args.results, "a") as f:
-            f.write(f'{int(predictions[0])}\n')
+            f.write('{}\n'.format(int(predictions[0])))
 
         with open(args.time, 'a') as f:
-            f.write(f'{test_time:.2f}\n')
+            f.write('{}\n'.format(test_time))
