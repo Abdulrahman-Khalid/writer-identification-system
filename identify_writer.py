@@ -43,15 +43,6 @@ def hog_pipeline(gray_image, **kwargs):
     return hog(resize(binary_image, 0.4), feature_vector=True, block_norm='L2-Hys')[:1000]
 
 
-def hu_moments_pipeline(gray_image, **kwargs):
-    binary_image, gray_image = image_preprocessing(gray_image)
-    binary_lines, _ = line_segmentation(binary_image, gray_image)
-    hus = []
-    for line in binary_lines:
-        hus.extend(cv2.HuMoments(cv2.moments(line)).flatten())
-    return hus[:7*4]
-
-
 def hu_moments_window_pipeline(gray_image, **kwargs):
     if 'binary_image' in kwargs:
         binary_image = kwargs['binary_image']
@@ -69,13 +60,6 @@ def hu_moments_window_pipeline(gray_image, **kwargs):
             if len(hus) >= size:
                 return hus[:size]
     return hus[:size]
-
-
-def hu_hog(gray_image, **kwargs):
-    binary_image, _ = image_preprocessing(gray_image)
-    a = list(hu_moments_pipeline(gray_image))
-    b = list(hog_pipeline(gray_image, binary_image=binary_image))
-    return a + b
 
 
 def huw_hog(gray_image, **kwargs):
@@ -110,9 +94,7 @@ def all_features(all_imgs, pipeline, jobs, out):
 pipelines = {
     'lbp': lbp_pipeline,
     'hog': hog_pipeline,
-    'hu': hu_moments_pipeline,
     'huw': hu_moments_window_pipeline,
-    'hu+hog': hu_hog,
     'huw+hog': huw_hog,
 }
 
