@@ -38,9 +38,9 @@ def image_preprocessing(gray_image):
     lines = cv2.HoughLinesP(edges, rho=1, theta=np.pi/180, threshold=300,
                             lines=np.array([]), minLineLength=80, maxLineGap=1)
 
-    y_values = []
+    y_values = np.zeros(lines.shape[0], dtype='int')
     for i in range(lines.shape[0]):
-        y_values.append(lines[i][0][1])
+        y_values[i] = lines[i][0][1]
 
     # Initialize upper and lower lines with heuristic values in case of hough failure
     y_lowerline = 2800
