@@ -2,6 +2,12 @@ import cv2
 import numpy as np
 
 
+def resize(img, scale):
+    width = int(img.shape[1] * scale)
+    height = int(img.shape[0] * scale)
+    return cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
+
+
 def show_image(image, window_name='image', save_name='image.png'):
     cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(window_name, image.shape[0] // 2, image.shape[1] // 2)

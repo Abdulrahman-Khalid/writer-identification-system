@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from feature_extractor import get_features
 from image_classification import image_classification
-from image_preprocessing import image_preprocessing
+from image_preprocessing import image_preprocessing, resize
 from image_segmentation import line_segmentation
 
 
@@ -34,19 +34,13 @@ def read_test_case_images(path):
     return test_image_path, train_images_paths, train_images_labels
 
 
-def resize(img, scale):
-    width = int(img.shape[1] * scale / 100)
-    height = int(img.shape[0] * scale / 100)
-    return cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
-
-
 def hog_pipeline(gray_image, **kwargs):
     if 'binary_image' in kwargs:
         binary_image = kwargs['binary_image']
     else:
         binary_image, _ = image_preprocessing(gray_image)
 
-    return hog(resize(binary_image, 40), feature_vector=True, block_norm='L2-Hys')[:1000]
+    return hog(resize(binary_image, 0.4), feature_vector=True, block_norm='L2-Hys')[:1000]
 
 
 def hu_moments_pipeline(gray_image, **kwargs):
