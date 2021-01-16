@@ -106,8 +106,7 @@ def with_index(fn, i):
 
 
 def all_features(all_imgs, pipeline, jobs, out):
-    n_jobs = jobs if jobs != -1 else len(all_imgs)
-    unordered_results = Parallel(n_jobs=n_jobs)(
+    unordered_results = Parallel(n_jobs=jobs)(
         delayed(with_index(pipeline, i))(all_imgs[i]) for i in range(len(all_imgs))
     )
     for i, arr in unordered_results:
@@ -132,8 +131,8 @@ if __name__ == "__main__":
                         help='path to time output file', default='time.txt')
     parser.add_argument('--pipeline', default='lbp',
                         choices=list(pipelines.keys()))
-    parser.add_argument('-j', '--jobs', default=-1, type=int,
-                        help='number of parallel jobs, -1 for maximum')
+    parser.add_argument('-j', '--jobs', default=7, type=int,
+                        help='number of parallel jobs, -1 for all cpus')
     args = parser.parse_args()
 
     test_cases = sorted_subdirectories(args.data)
@@ -181,4 +180,4 @@ if __name__ == "__main__":
             f.write('{}\n'.format(int(predictions[0])))
 
         with open(args.time, 'a') as f:
-            f.write('{}\n'.format(test_time))
+            f.write('{:.2f}\n'.format(test_time))
