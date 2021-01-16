@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from skimage.feature import local_binary_pattern
 
+from image_segmentation import line_segmentation_gen
+
 # 20 examples
 # no_points = 8*3 and radius = 3 and method = 'uniform' ----> accuracy = 90%
 # no_points = 8 and radius = 3 and method = 'uniform' ----> Accuracy: 85.0%, Average time: 12.17s
@@ -16,17 +18,16 @@ from skimage.feature import local_binary_pattern
 # no_points = 4 and radius = 3 and method = 'default' with not inverted binary image ----> Accuracy: 70.0%, Average time: 5.14s
 
 
-def get_features(gray_lines, binary_lines, radius=3, no_points=8,
+def get_features(binary_image, gray_image, radius=3, no_points=8,
                  method='default'):
     features = np.zeros(256)
 
-    for idx in range(len(gray_lines)):
-        gray_line = gray_lines[idx]
-        binary_line = binary_lines[idx]
+    for binary_line, gray_line in line_segmentation_gen(binary_image, gray_image):
         lbp = local_binary_pattern(
-            gray_line, no_points, radius, method=method).astype(np.uint8)
-        features = cv2.calcHist([lbp], [0], binary_line, [256], [
-                                0, 256], features, True).ravel()
+            gray_line, no_points, radius, method=method
+        ).astype(np.uint8)
+        features = cv2.calcHist([lbp], [0], binary_line, [256],
+                                [0, 256], features, True).ravel()
 
     return features / np.mean(features)
 

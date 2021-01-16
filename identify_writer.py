@@ -96,9 +96,7 @@ def huw_hog(gray_image, **kwargs):
 
 
 def lbp_pipeline(gray_image, **kwargs):
-    binary_image, gray_image = image_preprocessing(gray_image)
-    binary_lines, gray_lines = line_segmentation(binary_image, gray_image)
-    return get_features(gray_lines, binary_lines)
+    return get_features(*image_preprocessing(gray_image))
 
 
 def with_index(fn, i):

@@ -4,7 +4,10 @@ import cv2
 import numpy as np
 
 
-def line_segmentation(binary_image, gray_image):
+def line_segmentation_gen(binary_image, gray_image):
+    '''
+    generator version
+    '''
     # Apply Dilation to mix all line words together
     dilation_kernel = np.ones((1, 190), np.uint8)
     image_dilation = cv2.dilate(
@@ -18,15 +21,26 @@ def line_segmentation(binary_image, gray_image):
         remove_vertical.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Extract lines
-    binary_lines = []
-    gray_lines = []
     for line in lines_contours:
         x, y, w, h = cv2.boundingRect(line)
         if h > 30:
-            binary_lines.append(
-                binary_image[max(y-30, 0):min(y+h+60, binary_image.shape[1]), x:x+w])
-            gray_lines.append(
-                gray_image[max(y-30, 0):min(y+h+60, gray_image.shape[1]), x:x+w])
+            binary_line = binary_image[
+                max(y-30, 0):min(y+h+60, binary_image.shape[1]),
+                x:x+w
+            ]
+            gray_line = gray_image[
+                max(y-30, 0):min(y+h+60, gray_image.shape[1]),
+                x:x+w
+            ]
+            yield binary_line, gray_line
+
+
+def line_segmentation(binary_image, gray_image):
+    binary_lines = []
+    gray_lines = []
+    for binary_line, gray_line in line_segmentation_gen(binary_image, gray_image):
+        binary_lines.append(binary_line)
+        gray_lines.append(gray_line)
 
     return binary_lines, gray_lines
 
