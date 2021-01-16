@@ -4,9 +4,10 @@ Identify the writer of a handwritten document out of 3 writers.
 ## Requirements
 - python3
 - python3-pip
+- virtualenv
 
 ```
-$ pip3 install -r requirements.txt
+$ ./setup.sh
 ```
 
 ## Run The Classifier
