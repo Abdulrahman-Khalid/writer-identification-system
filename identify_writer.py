@@ -140,17 +140,17 @@ if __name__ == "__main__":
         test_image_path, train_images_paths, \
             train_images_labels = read_test_case_images(path)
 
+        # allocate buffer ahead
+        if args.pipeline == 'lbp':
+            features = np.zeros((len(train_images_paths)+1, 256))
+        else:
+            features = [0]*(len(train_images_paths)+1)
+
         # read all imgs before the timer
         all_imgs = [
             cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
             for image_path in [*train_images_paths, test_image_path]
         ]
-
-        # allocate buffer ahead
-        if args.pipeline == 'lbp':
-            features = np.zeros((len(all_imgs), 256))
-        else:
-            features = [0]*len(all_imgs)
 
         # ------ start timer ------ #
         time_before = time()
