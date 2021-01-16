@@ -9,7 +9,7 @@ from skimage.feature import hog
 from tqdm import tqdm
 
 from feature_extractor import get_features
-from image_classification import image_classification
+from image_classification import image_classification, classifiers
 from image_preprocessing import image_preprocessing, resize
 from image_segmentation import line_segmentation
 
@@ -127,6 +127,8 @@ if __name__ == "__main__":
                         choices=list(pipelines.keys()))
     parser.add_argument('-j', '--jobs', default=7, type=int,
                         help='number of parallel jobs, -1 for all cpus')
+    parser.add_argument('--classifier',
+                        default='svm-sigmoid', choices=classifiers.keys())
     args = parser.parse_args()
 
     test_cases = sorted_subdirectories(args.data)
@@ -160,6 +162,7 @@ if __name__ == "__main__":
         )
 
         predictions = image_classification(
+            args.classifier,
             # train
             features[:-1],
             train_images_labels,
