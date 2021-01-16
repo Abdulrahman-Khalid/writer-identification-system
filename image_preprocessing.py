@@ -40,7 +40,7 @@ def image_preprocessing(gray_image):
 
     # Initialize upper and lower lines with heuristic values in case of hough failure
     y_lowerline = 2800
-    y_upperline = 650
+    y_upperline = 680
 
     if lines is not None:
         y_values = np.zeros(lines.shape[0], dtype='int')
