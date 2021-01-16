@@ -16,8 +16,10 @@ from skimage.feature import local_binary_pattern
 # no_points = 4 and radius = 3 and method = 'default' with not inverted binary image ----> Accuracy: 70.0%, Average time: 5.14s
 
 
-def get_features(gray_lines, binary_lines, features, radius=3, no_points=8,
+def get_features(gray_lines, binary_lines, radius=3, no_points=8,
                  method='default'):
+    features = np.zeros(256)
+
     for idx in range(len(gray_lines)):
         gray_line = gray_lines[idx]
         binary_line = binary_lines[idx]

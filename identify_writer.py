@@ -4,6 +4,7 @@ from time import time
 
 import cv2
 import numpy as np
+from joblib import Parallel, delayed
 from skimage.feature import hog
 from tqdm import tqdm
 
@@ -94,15 +95,18 @@ def huw_hog(gray_image, **kwargs):
     return a + b
 
 
-def lbp_pipeline(gray_image, out):
+def lbp_pipeline(gray_image, i):
     binary_image, gray_image = image_preprocessing(gray_image)
     binary_lines, gray_lines = line_segmentation(binary_image, gray_image)
-    return get_features(gray_lines, binary_lines, out)
+    return i, get_features(gray_lines, binary_lines)
 
 
 def all_features_opt(all_imgs, out):
-    for i in range(len(all_imgs)):
-        out[i] = lbp_pipeline(all_imgs[i], out[i])
+    unordered_results = Parallel(n_jobs=len(all_imgs))(
+        delayed(lbp_pipeline)(all_imgs[i], i) for i in range(len(all_imgs))
+    )
+    for i, arr in unordered_results:
+        out[i] = arr
 
 
 def all_features(all_imgs, pipeline):
