@@ -38,26 +38,25 @@ def image_preprocessing(gray_image):
     lines = cv2.HoughLinesP(edges, rho=1, theta=np.pi/180, threshold=300,
                             lines=np.array([]), minLineLength=80, maxLineGap=1)
 
-    y_values = np.zeros(lines.shape[0], dtype='int')
-    for i in range(lines.shape[0]):
-        y_values[i] = lines[i][0][1]
-
     # Initialize upper and lower lines with heuristic values in case of hough failure
     y_lowerline = 2800
     y_upperline = 650
 
-    # Detect upper and lower lines that contains the handwritten text
-    y_values.sort()
+    if lines is not None:
+        y_values = np.zeros(lines.shape[0], dtype='int')
+        for i in range(lines.shape[0]):
+            y_values[i] = lines[i][0][1]
+        y_values.sort()
 
-    # Detect upper and lower lines that contains the handwritten text
-    document_median = binary_image.shape[1] // 2
+        # Detect upper and lower lines that contains the handwritten text
+        document_median = binary_image.shape[1] // 2
 
-    for idx, value in enumerate(y_values):
-        if value > document_median:
-            y_lowerline = value
-            y_upperline = y_values[idx - 1] if idx != 0 \
-                and y_values[idx - 1] < document_median else y_upperline
-            break
+        for idx, value in enumerate(y_values):
+            if value > document_median:
+                y_lowerline = value
+                y_upperline = y_values[idx - 1] if idx != 0 \
+                    and y_values[idx - 1] < document_median else y_upperline
+                break
 
     gray_image = gray_image[y_upperline:y_lowerline-3, :]
     binary_image = binary_image[y_upperline:y_lowerline-3, :]
