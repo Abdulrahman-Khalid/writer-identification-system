@@ -4,6 +4,11 @@
 $ ./build.sh
 ```
 
+## Activate Virtual Environment
+```
+$ source .virtualenv/bin/activate;
+```
+
 ## Run
 Same as `identify_writer.py` in the root dir.
 ```
