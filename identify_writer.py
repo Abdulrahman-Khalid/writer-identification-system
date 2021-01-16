@@ -95,22 +95,25 @@ def huw_hog(gray_image, **kwargs):
     return a + b
 
 
-def lbp_pipeline(gray_image, i):
+def lbp_pipeline(gray_image, **kwargs):
     binary_image, gray_image = image_preprocessing(gray_image)
     binary_lines, gray_lines = line_segmentation(binary_image, gray_image)
-    return i, get_features(gray_lines, binary_lines)
+    return get_features(gray_lines, binary_lines)
 
 
-def all_features_opt(all_imgs, out):
-    unordered_results = Parallel(n_jobs=len(all_imgs))(
-        delayed(lbp_pipeline)(all_imgs[i], i) for i in range(len(all_imgs))
+def with_index(fn, i):
+    def newfn(*args, **kwargs):
+        return i, fn(*args, **kwargs)
+    return newfn
+
+
+def all_features(all_imgs, pipeline, disable_parallel, out):
+    n_jobs = 1 if disable_parallel else len(all_imgs)
+    unordered_results = Parallel(n_jobs=n_jobs)(
+        delayed(with_index(pipeline, i))(all_imgs[i]) for i in range(len(all_imgs))
     )
     for i, arr in unordered_results:
         out[i] = arr
-
-
-def all_features(all_imgs, pipeline):
-    return np.array([pipeline(img) for img in all_imgs])
 
 
 pipelines = {
@@ -131,6 +134,8 @@ if __name__ == "__main__":
                         help='path to time output file', default='time.txt')
     parser.add_argument('--pipeline', default='lbp',
                         choices=list(pipelines.keys()))
+    parser.add_argument('--no-parallel', action='store_true',
+                        help='disable parallism')
     args = parser.parse_args()
 
     test_cases = sorted_subdirectories(args.data)
@@ -151,15 +156,17 @@ if __name__ == "__main__":
         ]
 
         # allocate buffer ahead
-        features = np.zeros((len(all_imgs), 256))
+        if args.pipeline == 'lbp':
+            features = np.zeros((len(all_imgs), 256))
+        else:
+            features = [0]*len(all_imgs)
 
         # ------ start timer ------ #
         time_before = time()
 
-        if args.pipeline == 'lbp':
-            all_features_opt(all_imgs, features)
-        else:
-            features = all_features(all_imgs, pipelines[args.pipeline])
+        all_features(
+            all_imgs, pipelines[args.pipeline], args.no_parallel, features
+        )
 
         train_images_features = features[:-1]
         test_image_features = np.array([features[-1]])
