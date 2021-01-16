@@ -105,8 +105,8 @@ def with_index(fn, i):
     return newfn
 
 
-def all_features(all_imgs, pipeline, disable_parallel, out):
-    n_jobs = 1 if disable_parallel else len(all_imgs)
+def all_features(all_imgs, pipeline, jobs, out):
+    n_jobs = jobs if jobs != -1 else len(all_imgs)
     unordered_results = Parallel(n_jobs=n_jobs)(
         delayed(with_index(pipeline, i))(all_imgs[i]) for i in range(len(all_imgs))
     )
@@ -132,8 +132,8 @@ if __name__ == "__main__":
                         help='path to time output file', default='time.txt')
     parser.add_argument('--pipeline', default='lbp',
                         choices=list(pipelines.keys()))
-    parser.add_argument('--no-parallel', action='store_true',
-                        help='disable parallism')
+    parser.add_argument('-j', '--jobs', default=-1, type=int,
+                        help='number of parallel jobs, -1 for maximum')
     args = parser.parse_args()
 
     test_cases = sorted_subdirectories(args.data)
@@ -163,15 +163,15 @@ if __name__ == "__main__":
         time_before = time()
 
         all_features(
-            all_imgs, pipelines[args.pipeline], args.no_parallel, features
+            all_imgs, pipelines[args.pipeline], args.jobs, features
         )
 
-        train_images_features = features[:-1]
-        test_image_features = np.array([features[-1]])
         predictions = image_classification(
-            train_images_features,
+            # train
+            features[:-1],
             train_images_labels,
-            test_image_features,
+            # test
+            np.array([features[-1]]),
         )
 
         test_time = time() - time_before
