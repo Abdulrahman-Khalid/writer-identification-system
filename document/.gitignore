@@ -14,3 +14,6 @@
 *.bbl
 *.synctex.gz
 *.fdb_latexmk
+*.run.xml
+*.blg
+*.bcf
