@@ -16,6 +16,8 @@ correct_writers.txt
 __pycache__/
 *.py[cod]
 *$py.class
+*.txt
+!requirments.txt
 
 # C extensions
 *.so
