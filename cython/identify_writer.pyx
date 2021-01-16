@@ -63,41 +63,8 @@ cpdef tuple image_preprocessing(np.ndarray gray_image):
     binary_image = binary_image[y_upperline:y_lowerline-3, :]
 
     return binary_image, gray_image
-#######################################################################################################################
-
-# cpdef line_segmentation_gen(np.ndarray binary_image, np.ndarray gray_image):
-#     '''
-#     generator version
-#     '''
-#     # Apply Dilation to mix all line words together
-#     cdef np.ndarray dilation_kernel = np.ones((1, 190), np.uint8)
-#     cdef np.ndarray image_dilation = cv2.dilate(
-#         binary_image, dilation_kernel, iterations=1).astype(np.uint8)
-#     # Remove thin vertical lines to distinct overlaped lines
-#     cdef np.ndarray vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (370, 1))
-#     cdef np.ndarray remove_vertical = cv2.morphologyEx(
-#         image_dilation, cv2.MORPH_OPEN, vertical_kernel)
-#     # Find image contours which indicate lines
-#     cdef list lines_contours
-#     lines_contours, _ = cv2.findContours(
-#         remove_vertical.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-#     # Extract lines
-#     for line in lines_contours:
-#         x, y, w, h = cv2.boundingRect(line)
-#         if h > 30:
-#             binary_line = binary_image[
-#                 max(y-30, 0):min(y+h+60, binary_image.shape[1]),
-#                 x:x+w
-#             ]
-#             gray_line = gray_image[
-#                 max(y-30, 0):min(y+h+60, gray_image.shape[1]),
-#                 x:x+w
-#             ]
-#             yield binary_line, gray_line
 
 #######################################################################################################################
-
 
 cpdef np.ndarray get_features(np.ndarray binary_image, np.ndarray gray_image):
     cdef np.ndarray features = np.zeros(256)
@@ -164,48 +131,3 @@ cpdef np.ndarray get_predictions(list all_imgs, list train_images_labels, int jo
         train_images_labels,
         np.array([features[-1]])
     )
-
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('--data', help='path to data dir', default='../data')
-#     parser.add_argument('--results',
-#                         help='path to results output file', default='../results.txt')
-#     parser.add_argument('--time',
-#                         help='path to time output file', default='../time.txt')
-#     parser.add_argument('-j', '--jobs', default=-1, type=int,
-#                         help='number of parallel jobs, -1 for maximum')
-#     args = parser.parse_args()
-
-#     test_cases = sorted_subdirectories(args.data)
-
-#     # clear files
-#     open(args.results, "w")
-#     open(args.time, "w")
-
-#     for test_case in tqdm(test_cases, desc='Test Cases', unit='case'):
-#         path = os.path.join(args.data, test_case)
-#         test_image_path, train_images_paths, \
-#             train_images_labels = read_test_case_images(path)
-
-#         # read all imgs before the timer
-#         all_imgs = [
-#             cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-#             for image_path in [*train_images_paths, test_image_path]
-#         ]
-
-#         # allocate buffer ahead
-#         features = np.zeros((len(all_imgs), 256))
-
-#         # ------ start timer ------ #
-#         time_before = time()
-
-#         predictions = get_predictions(all_imgs, train_images_labels, args.jobs, features)
-
-#         test_time = time() - time_before
-#         # ------ end timer ------ #
-
-#         with open(args.results, "a") as f:
-#             f.write('{}\n'.format(int(predictions[0])))
-
-#         with open(args.time, 'a') as f:
-#             f.write('{}\n'.format(test_time))
