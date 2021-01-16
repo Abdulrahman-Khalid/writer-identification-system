@@ -146,12 +146,15 @@ cpdef np.ndarray get_features(np.ndarray binary_image, np.ndarray gray_image):
 
 #######################################################################################################################
 
-cpdef np.ndarray lbp_pipeline(np.ndarray gray_image):
-    return get_features(*image_preprocessing(gray_image))
+cpdef tuple lbp_pipeline(np.ndarray gray_image, int i):
+    return i, get_features(*image_preprocessing(gray_image))
 
-cpdef void all_features(list all_imgs, int jobs, np.ndarray out):
-    for i in range(len(all_imgs)):
-        out[i] = lbp_pipeline(all_imgs[i])
+cdef void all_features(list all_imgs, int jobs, np.ndarray out):
+    unordered_results = Parallel(n_jobs=jobs,backend='threading')(
+        delayed(lbp_pipeline)(all_imgs[i], i) for i in range(len(all_imgs))
+    )
+    for i, arr in unordered_results:
+        out[i] = arr
 
 cpdef np.ndarray get_predictions(list all_imgs, list train_images_labels, int jobs, np.ndarray features):
     all_features(all_imgs, jobs, features)
