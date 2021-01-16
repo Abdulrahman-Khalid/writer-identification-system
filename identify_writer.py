@@ -180,4 +180,4 @@ if __name__ == "__main__":
             f.write('{}\n'.format(int(predictions[0])))
 
         with open(args.time, 'a') as f:
-            f.write('{}\n'.format(test_time))
+            f.write('{:.2f}\n'.format(test_time))
