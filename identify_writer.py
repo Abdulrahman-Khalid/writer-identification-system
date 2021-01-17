@@ -9,9 +9,8 @@ from skimage.feature import hog
 from tqdm import tqdm
 
 from feature_extractor import get_features
-from image_classification import image_classification, classifiers
+from image_classification import classifiers, image_classification
 from image_preprocessing import image_preprocessing, resize
-from image_segmentation import line_segmentation
 
 
 def sorted_subdirectories(path):
