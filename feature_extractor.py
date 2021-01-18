@@ -15,9 +15,9 @@ from image_segmentation import line_segmentation_gen
 # no_points = 4 and radius = 3 and method = 'ror' ----> Accuracy: 90.0%, Average time: 7.78s
 # 100 examples
 # no_points = 4 and radius = 3 and method = 'default' ----> Accuracy: 98.0%, Average time: 6.56s
-# no_points = 4 and radius = 3 and method = 'default' with not inverted binary image ----> Accuracy: 70.0%, Average time: 5.14s
+# no_points = 4 and radius = 3 and method = 'default' with hist to count the white pixels only ----> Accuracy: 70.0%, Average time: 5.14s
 
-
+# cv2.calcHist(images, channels, mask, histSize, ranges, hist, accumulate)
 def get_features(binary_image, gray_image, radius=3, no_points=8,
                  method='default'):
     features = np.zeros(256)
