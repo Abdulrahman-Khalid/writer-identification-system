@@ -6,17 +6,17 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage[hidelinks]{hyperref}
-\usepackage{xcolor}
 \usepackage{subcaption}
 \usepackage[labelformat=parens,labelsep=quad,skip=3pt]{caption}
 \usepackage{fancyhdr}
 \usepackage[textwidth = 155mm]{geometry}
-\usepackage{tabularx}
+\usepackage[table,xcdraw]{xcolor}
 \usepackage[english]{babel}
 \usepackage[backend=biber,style=numeric,sorting=ynt]{biblatex}
 \usepackage{textpos}
 \usepackage{color}
 \usepackage{listings}
+\usepackage{tablefootnote}
 
 \addbibresource{report.bib}
 
@@ -26,6 +26,8 @@
 \newcommand{\titleText}{Text Independent Writer Recognition Using LBPH \& SVM}
 \newcommand{\course}{CMP450 -- Semester 20/21}
 \newcommand{\teamname}{Team \#1}
+
+\graphicspath{ {./figures/} }
 
 \title{\normalsize{\course} \\\Huge{\titleText} \\\vspace*{7pt} \normalsize{\today}}
 
@@ -96,17 +98,13 @@
     \maketitle
     \thispagestyle{plain}
 
-    \begin{abstract}
-      % TODO
-    \end{abstract}
-
     \input{sections/intro.tex}    
     \input{sections/pipelineSummary.tex}
     \input{sections/preprocessing.tex}
     \input{sections/featureExtraction.tex}
     \input{sections/classification.tex}
-    \input{sections/performanceAnalysis.tex}
     \input{sections/performanceEnhancements.tex}
+    \input{sections/performanceAnalysis.tex}
     \input{sections/unsuccessfulTrials.tex}
     \input{sections/futureWork.tex}
     \input{sections/workDistribution.tex}
