@@ -9,9 +9,8 @@ from skimage.feature import hog
 from tqdm import tqdm
 
 from feature_extractor import get_features
-from image_classification import image_classification
-from image_preprocessing import image_preprocessing
-from image_segmentation import line_segmentation
+from image_classification import classifiers, image_classification
+from image_preprocessing import image_preprocessing, resize
 
 
 def sorted_subdirectories(path):
@@ -34,28 +33,13 @@ def read_test_case_images(path):
     return test_image_path, train_images_paths, train_images_labels
 
 
-def resize(img, scale):
-    width = int(img.shape[1] * scale / 100)
-    height = int(img.shape[0] * scale / 100)
-    return cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
-
-
 def hog_pipeline(gray_image, **kwargs):
     if 'binary_image' in kwargs:
         binary_image = kwargs['binary_image']
     else:
         binary_image, _ = image_preprocessing(gray_image)
 
-    return hog(resize(binary_image, 40), feature_vector=True, block_norm='L2-Hys')[:1000]
-
-
-def hu_moments_pipeline(gray_image, **kwargs):
-    binary_image, gray_image = image_preprocessing(gray_image)
-    binary_lines, _ = line_segmentation(binary_image, gray_image)
-    hus = []
-    for line in binary_lines:
-        hus.extend(cv2.HuMoments(cv2.moments(line)).flatten())
-    return hus[:7*4]
+    return hog(resize(binary_image, 0.4), feature_vector=True, block_norm='L2-Hys')[:1000]
 
 
 def hu_moments_window_pipeline(gray_image, **kwargs):
@@ -75,13 +59,6 @@ def hu_moments_window_pipeline(gray_image, **kwargs):
             if len(hus) >= size:
                 return hus[:size]
     return hus[:size]
-
-
-def hu_hog(gray_image, **kwargs):
-    binary_image, _ = image_preprocessing(gray_image)
-    a = list(hu_moments_pipeline(gray_image))
-    b = list(hog_pipeline(gray_image, binary_image=binary_image))
-    return a + b
 
 
 def huw_hog(gray_image, **kwargs):
@@ -116,9 +93,7 @@ def all_features(all_imgs, pipeline, jobs, out):
 pipelines = {
     'lbp': lbp_pipeline,
     'hog': hog_pipeline,
-    'hu': hu_moments_pipeline,
     'huw': hu_moments_window_pipeline,
-    'hu+hog': hu_hog,
     'huw+hog': huw_hog,
 }
 
@@ -133,6 +108,8 @@ if __name__ == "__main__":
                         choices=list(pipelines.keys()))
     parser.add_argument('-j', '--jobs', default=7, type=int,
                         help='number of parallel jobs, -1 for all cpus')
+    parser.add_argument('--classifier',
+                        default='svm-sigmoid', choices=classifiers.keys())
     args = parser.parse_args()
 
     test_cases = sorted_subdirectories(args.data)
@@ -146,17 +123,17 @@ if __name__ == "__main__":
         test_image_path, train_images_paths, \
             train_images_labels = read_test_case_images(path)
 
+        # allocate buffer ahead
+        if args.pipeline == 'lbp':
+            features = np.zeros((len(train_images_paths)+1, 256))
+        else:
+            features = [0]*(len(train_images_paths)+1)
+
         # read all imgs before the timer
         all_imgs = [
             cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
             for image_path in [*train_images_paths, test_image_path]
         ]
-
-        # allocate buffer ahead
-        if args.pipeline == 'lbp':
-            features = np.zeros((len(all_imgs), 256))
-        else:
-            features = [0]*len(all_imgs)
 
         # ------ start timer ------ #
         time_before = time()
@@ -166,6 +143,7 @@ if __name__ == "__main__":
         )
 
         predictions = image_classification(
+            args.classifier,
             # train
             features[:-1],
             train_images_labels,

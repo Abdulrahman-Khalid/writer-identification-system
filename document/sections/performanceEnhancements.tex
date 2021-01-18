@@ -1,0 +1,12 @@
+\section{Speed Enhancements}
+We put alot of effort on speeding up the training process.
+The most effective optimization was parallelizing the feature extraction by extracting each image's features in a seperate process and then collecting all the features before training.
+
+Processes are quite heavy, but python threads are totally useless, thanks to \texttt{GIL}'s locking mechanism.
+We believe that if we port the code to another language, the execution time would be much lower using threads and manual memory allocation.
+
+Python lists are known to be very slow, so we replaced them all with numpy arrays, and allocated most of the needed memory ahead before all training.
+A quite speed gain came from fine tuning \texttt{skimage} and \texttt{OpenCV} parameters.
+
+We tried to use \texttt{Numba} and \texttt{Cython} to optimize the execution time but they didn't have an effect.
+It was probably becaue most of the code calls numpy, \texttt{skimage} and \texttt{OpenCV}, which are all written in C and well optimized for memory and cpu.
