@@ -17,3 +17,5 @@
 *.run.xml
 *.blg
 *.bcf
+
+!figures/*

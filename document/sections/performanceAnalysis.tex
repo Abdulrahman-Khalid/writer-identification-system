@@ -1,2 +1,23 @@
 \section{Performance Analysis}
-% TODO
+To analyze the performance of our system we created two utility scripts for generating a test set and measuring performance. 
+
+The first script generates a random test set from the IAM database. For each test case, it randomly picks three writers, two sample forms for each writer, and a test form that is written by one of these writers. Since the images in the IAM database are large in size (a few MBs each), the script creates hard links to the existing images instead of copying them over to the test set. This enabled us to create huge test sets without worrying about space.
+
+The second script measures the performance of our writer identification system by comparing it's output to the test set's expected output, and calculates the overall accuracy and average time spent per test case (excluding I/O time).
+
+Using these two scripts, we analyzed our system's performance a computer running AMD's Ryzen 9 4000 8-core processor with 16 GBs of RAM, and produced the following results: \\
+
+\begin{table}[h]  \centering
+\begin{tabular}{|c|c|c|}
+    \hline
+    \cellcolor[HTML]{C0C0C0} \textbf{Test Set Size} & 
+    \cellcolor[HTML]{C0C0C0} \textbf{Accuracy} & 
+    \cellcolor[HTML]{C0C0C0} \textbf{Average Time}\\
+    \hline
+    \cellcolor[HTML]{C0C0C0} \textbf{100} & 99\% & 1.03 sec\\ \hline
+    \cellcolor[HTML]{C0C0C0} \textbf{1000} & 98.9\% & 0.96 sec \\ \hline
+    \cellcolor[HTML]{C0C0C0} \textbf{10,000} &  98.8\% & 0.93 sec \\ \hline
+\end{tabular}
+\end{table}
+
+The average time varies depending on the computer specifications, especially the number of cores in the processor as we parallelize the feature extraction on available cores.
