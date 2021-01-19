@@ -1,2 +1,14 @@
 \section{Classification Module}
-% TODO
+The classification module aims to train the features extracted from handwritten samples from the three different writers with their labels, then trying to predict the test handwritten sample's writer.
+
+After research we chose support vector machine, SVM for short, to be our classification module as it has lots of pros we need such as:
+\begin{itemize}
+    \item It has lots of pros, such as it is useful in cases where the number of dimensions is greater than the number of samples.
+    \item It uses a subset of training points in the decision function. Hence, it is memory efficient.
+    \item It is useful in high dimensional spaces.
+\end{itemize}
+
+The SVM algorithm's objective is to find a hyperplane that distinctly classifies the data points in an N-dimensional space where \texttt{N} is the number of features.
+
+We are using a \texttt{sigmoid} kernel with penalty parameter \texttt{C=1} and \texttt{ovo} decision function.
+Furthermore, after fitting the training images' features with their labels, we use the SVM to predict the writer from the test image features.
