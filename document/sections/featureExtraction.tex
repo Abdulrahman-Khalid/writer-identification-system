@@ -41,5 +41,5 @@ Figure \ref{fig:lbp_to_output} Finally, yielding the LBP value and store it in t
 By fine-tuning the parameters of LBP such as the number of points \texttt{p} in a circularly symmetric neighborhood and the radius of the circle \texttt{r}
 We chose radius equals 3 and 8 neighbors as it gives us the sweet spot between accuracy and speed. Another acceptable parameter will be four neighbors with a radius of 3. It also works very well with a little dropdown in the accuracy and less calculation time.
 After calculating the LBP image, we get our feature vector by taking its histogram as our feature vector, and by trials, we found out that masking it with the binary image to calculate only the histogram for the black pixels in the binary image gives us better accuracy.
-Moreover, because we have eight neighbors, we got 2 ^ 8 = 256 possible patterns, so our LBP image has a minimum value of 0 and a maximum value of 255, allowing us to construct a 256-bin histogram of LBP codes as our final feature vector.
+Moreover, because we have eight neighbors, we got $2 ^ 8 = 256$ possible patterns, so our LBP image has a minimum value of 0 and a maximum value of 255, allowing us to construct a 256-bin histogram of LBP codes as our final feature vector.
 Finally, we normalize our feature vector by dividing it by its means.
